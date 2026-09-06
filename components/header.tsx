@@ -3,9 +3,12 @@
 import Link from "next/link"
 import { useState } from "react"
 import { ShoppingBag, ShoppingCart, Menu, X, Search } from "lucide-react"
+import { useCartStore, useAuthStore } from "@/lib/store"
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const totalItems = useCartStore((s) => s.getTotalItems())
+  const user = useAuthStore((s) => s.user)
 
   return (
     <header className="sticky top-0 z-50 shadow-md">
@@ -27,15 +30,29 @@ export function Header() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <Link href="/cart" className="p-2 rounded-full hover:bg-white/10">
+            <Link href="/cart" className="relative p-2 rounded-full hover:bg-white/10">
               <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </Link>
-            <Link
-              href="/auth/login"
-              className="bg-white text-[#FF6B00] text-sm font-semibold px-3 py-1.5 rounded-full"
-            >
-              Login
-            </Link>
+            {user ? (
+              <Link
+                href="/profile"
+                className="bg-white/20 text-white text-sm font-semibold px-3 py-1.5 rounded-full"
+              >
+                Account
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="bg-white text-[#FF6B00] text-sm font-semibold px-3 py-1.5 rounded-full"
+              >
+                Login
+              </Link>
+            )}
             <button
               className="sm:hidden p-2"
               onClick={() => setOpen(!open)}
